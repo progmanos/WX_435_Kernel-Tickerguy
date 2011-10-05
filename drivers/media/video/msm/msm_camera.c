@@ -896,6 +896,7 @@ static int msm_get_stats(struct msm_sync *sync, void __user *arg)
 	if (copy_from_user(&se, arg,
 			sizeof(struct msm_stats_event_ctrl))) {
 		ERR_COPY_FROM_USER();
+		pr_err("%s: ERROR copying from user\n", __func__);
 		return -EFAULT;
 	}
 
@@ -910,7 +911,7 @@ static int msm_get_stats(struct msm_sync *sync, void __user *arg)
 		if (rc == 0)
 			rc = -ETIMEDOUT;
 		if (rc < 0) {
-			pr_err("%s: error %d\n", __func__, rc);
+			pr_err("%s: Wait error %d\n", __func__, rc);
 			return rc;
 		}
 	}
@@ -963,6 +964,7 @@ static int msm_get_stats(struct msm_sync *sync, void __user *arg)
 					sizeof(struct msm_stats_buf))) {
 				ERR_COPY_TO_USER();
 				rc = -EFAULT;
+				pr_err("%s: se.Stats copy ERROR\n", __func__);
 				goto failure;
 			}
 		} else if ((data->evt_msg.len > 0) &&
@@ -971,6 +973,7 @@ static int msm_get_stats(struct msm_sync *sync, void __user *arg)
 					data->evt_msg.data,
 					data->evt_msg.len)) {
 				ERR_COPY_TO_USER();
+				pr_err("%s: VFE_se.Stats copy ERROR\n", __func__);
 				rc = -EFAULT;
 				goto failure;
 			}
@@ -1010,6 +1013,7 @@ static int msm_get_stats(struct msm_sync *sync, void __user *arg)
 						ctrl->value,
 						ctrl->length)) {
 				ERR_COPY_TO_USER();
+				pr_err("%s: CAM_Q_CTRL se.Stats copy ERROR\n", __func__);
 				rc = -EFAULT;
 				goto failure;
 			}
@@ -1030,6 +1034,7 @@ static int msm_get_stats(struct msm_sync *sync, void __user *arg)
 			if (copy_to_user((void *)(se.ctrl_cmd.value),
 					ctrl->value, ctrl->length)) {
 				ERR_COPY_TO_USER();
+				pr_err("%s: CAM_Q_V4L2 se.Stats copy ERROR\n", __func__);
 				rc = -EFAULT;
 				goto failure;
 			}
@@ -1045,11 +1050,13 @@ static int msm_get_stats(struct msm_sync *sync, void __user *arg)
 
 	default:
 		rc = -EFAULT;
+		pr_err("%s: DEFAULT case ERROR\n", __func__);
 		goto failure;
 	} /* switch qcmd->type */
 	if (copy_to_user((void *)arg, &se, sizeof(se))) {
 		ERR_COPY_TO_USER();
 		rc = -EFAULT;
+		pr_err("%s: DEFAULT 2 case ERROR\n", __func__);
 		goto failure;
 	}
 
@@ -2639,7 +2646,7 @@ static int __msm_open(struct msm_sync *sync, const char *const apps_id)
 				pr_err("%s: setting sensor clocks failed: %d\n",
 					__func__, rc);
 				goto msm_open_done;
-			}
+			} 
 			rc = sync->sctrl.s_init(sync->sdata);
 			if (rc < 0) {
 				pr_err("%s: sensor init failed: %d\n",

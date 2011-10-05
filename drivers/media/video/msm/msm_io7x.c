@@ -172,9 +172,11 @@ int msm_camio_sensor_clk_on(struct platform_device *pdev)
 		goto mdc_no_mem;
 	}
 	camdev->camera_gpio_on();
+	pr_err("Open memory region: %s", pdev->name);
 	return msm_camio_clk_enable(CAMIO_VFE_MDC_CLK);
 
 mdc_no_mem:
+	pr_err("MDC_Nomem: Fail to open region %s: %d", pdev->name, rc);
 	release_mem_region(camio_ext.mdcphy, camio_ext.mdcsz);
 	return rc;
 }

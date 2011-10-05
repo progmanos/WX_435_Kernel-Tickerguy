@@ -373,6 +373,7 @@ static long hm0356_set_sensor_mode(int mode)
             break;
 
         default:
+            printk("INVALID sensor orientiation request %d.\n",hm0356info->sensor_Orientation);
         return -EINVAL;
     }
 
