@@ -112,7 +112,7 @@ static ssize_t fbx_leds_pwm_pause_lo_ms_store(struct device *dev,
 static DEVICE_ATTR(ledoff, 0644, NULL, fbx_leds_pwm_pause_lo_ms_store);
 
 static void fbx_leds_pwm_led_brightness_set(struct led_classdev *led_cdev,
-                   enum led_brightness brightness)
+                   enum led_brightness brightness)	
 {
     int idx = 0;
     
@@ -123,20 +123,27 @@ static void fbx_leds_pwm_led_brightness_set(struct led_classdev *led_cdev,
     else if (!strcmp(led_cdev->name, "button-backlight"))
         idx = FBX_CAPS_KEY_LED;
 
-    dev_info(led_cdev->dev, "%s: IDX[%d] %s\n", __func__, idx, brightness?"ON":"OFF");
+    dev_info(led_cdev->dev, "%s: IDX[%d] %s %d\n", __func__, idx, brightness?"ON":"OFF", brightness);
 
     mutex_lock(&fbx_leds_pwm_dd->led_state_lock);
     if (brightness) {
         if (fbx_leds_pwm_dd->led_state[idx] != FBX_LED_ON) {
-            
             if (idx == FBX_CAPS_KEY_LED) {                
-                pwm_config(fbx_leds_pwm_dd->pwm[idx], 20000, 20000);
+/*
+ * KD 2011-10-13
+ * Oh do come on.  This board supports PWM brightness and the wonderful
+ * people at Foxconn didn't bother with simple division?  Give me a f*ing 
+ * break.  Fixed so you can CHOOSE how bright your keypad LED is.
+ * 255 * 78 = approximately the previous 20000 value, 0 = 0, otherwise
+ * proportional.  Note that we have to 
+ */
+//              pwm_config(fbx_leds_pwm_dd->pwm[idx], 20000, 20000);
+                pwm_config(fbx_leds_pwm_dd->pwm[idx], (brightness * 78), 20000);
                 pwm_enable(fbx_leds_pwm_dd->pwm[idx]);
             } else {
                 pm8058_pwm_lut_config(fbx_leds_pwm_dd->pwm[idx], 20000, fbx_leds_pwm_dd->duty_pct, 8, 0, 63, 0, 0, PM_PWM_LUT_RAMP_UP);
                 pm8058_pwm_lut_enable(fbx_leds_pwm_dd->pwm[idx], 1);
             }
-    
             fbx_leds_pwm_dd->led_state[idx] = FBX_LED_ON;
         }
     } else {
