@@ -39,6 +39,7 @@
 #include <linux/memory.h>
 #include <linux/pm_runtime.h>
 #include <linux/wakelock.h>
+#include <linux/gpio.h>
 #include <linux/fs.h>
 #include <linux/pm.h>
 #include <linux/reboot.h>
@@ -1637,7 +1638,6 @@ msmsdcc_platform_sdiowakeup_irq(int irq, void *dev_id)
 		host->sdio_irq_disabled = 1;
 	}
 	spin_unlock(&host->lock);
-
 	return IRQ_HANDLED;
 }
 
