@@ -90,7 +90,7 @@ static int power_use = 0;
 static int ps_active = 0;
 static int ls_active = 0;
 // KD 2011-10-21 Leave "in call" state so sensor works
-//  int iPhoneCall = 0;
+// int iPhoneCall = 0;
 int iPhoneCall = 1;
 //DIV5-BSP-CH-SF6-SENSOR-PORTING04++[
 #if defined(CONFIG_FIH_PROJECT_SF4Y6)
@@ -388,7 +388,6 @@ static void ltr502als_inactive_ps(void)
 	{
 		DBG(KERN_INFO, "[LTR502ALS]  ps_active:%d\n", ps_active);
 	}
-	
 } 
 //DIV5-BSP-CH-SF6-SENSOR-PORTING04++[
 #if defined(CONFIG_FIH_PROJECT_SF4Y6)
@@ -829,6 +828,11 @@ _OWEN_ static void ALSPS_early_suspend_func(struct early_suspend * h)
 	}
 #endif
 //DIV5-BSP-CH-SF6-SENSOR-PORTING04++]
+//
+// KD - Enable interrupts
+//
+	enable_irq(ltr502als->client->irq);
+	enable_irq_wake(ltr502als->client->irq);
 	return;
 }
 _OWEN_ static void ALSPS_late_resume_func(struct early_suspend *h)
@@ -874,6 +878,11 @@ _OWEN_ static void ALSPS_late_resume_func(struct early_suspend *h)
 	}
 	#endif
 	//DIV5-BSP-CH-SF6-SENSOR-PORTING04++]
+//
+// KD Disable interrupts
+//
+	disable_irq(ltr502als->client->irq);
+	disable_irq_wake(ltr502als->client->irq);
 	return;		
 }
 /*static int ltr502als_suspend(struct device *dev)
