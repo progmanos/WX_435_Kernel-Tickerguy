@@ -384,13 +384,6 @@ int libra_sdio_resume(struct device *dev)
 		/* Restore SDIO IRQ */
 		libra_enable_sdio_irq(func, 1);				
 	}
-#ifdef	CONFIG_HAS_WAKELOCK
-//
-// KD - wakelock unlock
-//
-	wake_unlock(&wl_wifi);
-        printk("%s clear wakelock\n",__func__);
-#endif
         return 0;
 }
 
