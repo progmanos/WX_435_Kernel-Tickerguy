@@ -414,11 +414,11 @@ static int __init libra_sdioif_init(void)
 	libra_mmc_host = NULL;
 	libra_mmc_host_index = -1;
 
+	libra_loaded = 1;
+
 	sdio_register_driver(&libra_sdiofn_driver);
 
 	printk(KERN_INFO "%s: Loaded Successfully\n", __func__);
-
-	libra_loaded = 1;
 
 	return 0;
 }
@@ -443,7 +443,7 @@ static void __exit libra_sdioif_exit(void)
 	libra_mmc_host = NULL;
 	libra_mmc_host_index = -1;
 
-	printk(KERN_INFO "%s: Unloaded Successfully\n", __func__);
+	printk(KERN_INFO "%s: Unloaded Successfully, load flag was %d\n", __func__, libra_loaded);
 	libra_loaded = 0;
 }
 

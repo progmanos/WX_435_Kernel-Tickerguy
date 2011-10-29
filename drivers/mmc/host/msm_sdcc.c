@@ -1851,7 +1851,9 @@ static void msmsdcc_early_suspend(struct early_suspend *h)
 	if (libra_loaded) {
 		wake_lock(&host->sdio_wlan_lock);
 		printk("%s: [msm_sdcc] wake_lock WLAN\n", mmc_hostname(host->mmc));
-	}
+	} else {
+		printk("%s: [msm_sdcc] NO wake_lock WLAN NOT loaded\n", mmc_hostname(host->mmc));
+	}	
 	spin_lock_irqsave(&host->lock, flags);
 	host->polling_enabled = host->mmc->caps & MMC_CAP_NEEDS_POLL;
 	host->mmc->caps &= ~MMC_CAP_NEEDS_POLL;
@@ -1903,7 +1905,9 @@ static void msmsdcc_late_resume(struct early_suspend *h)
 	if (libra_loaded) {
 		wake_unlock(&host->sdio_wlan_lock);
 		printk("%s: [msm_sdcc] wake_unlock WLAN\n", mmc_hostname(host->mmc));
-	}	
+	} else {
+		printk("%s: [msm_sdcc] NO wake_unlock WLAN NOT loaded\n", mmc_hostname(host->mmc));
+	}
 	if (host->polling_enabled) {
 		spin_lock_irqsave(&host->lock, flags);
 		host->mmc->caps |= MMC_CAP_NEEDS_POLL;
