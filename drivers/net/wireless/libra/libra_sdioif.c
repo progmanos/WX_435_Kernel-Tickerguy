@@ -32,6 +32,8 @@ static int libra_mmc_host_index;
 suspend_handler_t* libra_suspend_hldr = NULL;
 resume_handler_t*  libra_resume_hldr = NULL;
 
+extern	int	libra_loaded;
+
 /**
  * libra_sdio_configure() - Function to configure the SDIO device param
  * @libra_sdio_rxhandler    Rx handler
@@ -416,6 +418,8 @@ static int __init libra_sdioif_init(void)
 
 	printk(KERN_INFO "%s: Loaded Successfully\n", __func__);
 
+	libra_loaded = 1;
+
 	return 0;
 }
 
@@ -440,7 +444,7 @@ static void __exit libra_sdioif_exit(void)
 	libra_mmc_host_index = -1;
 
 	printk(KERN_INFO "%s: Unloaded Successfully\n", __func__);
-
+	libra_loaded = 0;
 }
 
 module_init(libra_sdioif_init);

@@ -83,6 +83,11 @@ static struct dentry *debugfs_file;
 static int  msmsdcc_dbg_init(void);
 #endif
 
+// KD 2011-10-28 external definition for the libra driver flag
+// Note: This is initialized to zero (*not* loaded)
+static int libra_loaded = 0;
+EXPORT_SYMBOL(libra_loaded);
+
 static unsigned int msmsdcc_pwrsave = 1;
 static int support_sd_removal_turnoff = 1;
 
@@ -1843,8 +1848,10 @@ static void msmsdcc_early_suspend(struct early_suspend *h)
 #endif
 //DIV5-CONN-MW-POWER SAVING MODE-01+]
 //KD 2010-10-26 - Hold wakelock on the Wlan interface while asleep
-	wake_lock(&host->sdio_wlan_lock);
-	printk("%s: [msm_sdcc] wake_lock WLAN\n", mmc_hostname(host->mmc));
+	if (libra_loaded) {
+		wake_lock(&host->sdio_wlan_lock);
+		printk("%s: [msm_sdcc] wake_lock WLAN\n", mmc_hostname(host->mmc));
+	}
 	spin_lock_irqsave(&host->lock, flags);
 	host->polling_enabled = host->mmc->caps & MMC_CAP_NEEDS_POLL;
 	host->mmc->caps &= ~MMC_CAP_NEEDS_POLL;
@@ -1893,8 +1900,10 @@ static void msmsdcc_late_resume(struct early_suspend *h)
 	}
 
 //KD 2010-10-26 - Release wakelock on the Wlan interface when resuming
-	wake_unlock(&host->sdio_wlan_lock);
-	printk("%s: [msm_sdcc] wake_unlock WLAN\n", mmc_hostname(host->mmc));
+	if (libra_loaded) {
+		wake_unlock(&host->sdio_wlan_lock);
+		printk("%s: [msm_sdcc] wake_unlock WLAN\n", mmc_hostname(host->mmc));
+	}	
 	if (host->polling_enabled) {
 		spin_lock_irqsave(&host->lock, flags);
 		host->mmc->caps |= MMC_CAP_NEEDS_POLL;
