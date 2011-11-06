@@ -52,6 +52,13 @@
 #define DPS_DATA_MASK 	0x80
 #define DLS_DATA_MASK 	0x3F
 
+//
+// Norm the return value of the sensor to approximately ~300 for indoor
+// lighting.  It's not perfect but it's all we got and will make CM7 
+// happier.
+//
+#define	LS_MULT	30
+
 
 /* IOCTL */
 #define INACTIVE_PS		0
@@ -178,8 +185,8 @@ int read_light_sensor(void)
 {
 	int val;
 	val= i2c_smbus_read_byte_data(ltr502als->client, DATAREG);
-	DBG(KERN_INFO, "[LTR502ALS] READ_PS value=%d\n", (int)(val & DLS_DATA_MASK));
-	return val >= 0 ? (int)(val & DLS_DATA_MASK) : (-1);
+	DBG(KERN_INFO, "[LTR502ALS] READ_LS value=%d\n", (int)(val & DLS_DATA_MASK));
+	return val >= 0 ? (int)((val & DLS_DATA_MASK) * LS_MULT) : (-1);
 }
 EXPORT_SYMBOL(read_light_sensor);
 
@@ -625,7 +632,7 @@ static int ltr502als_ioctl(struct inode *inode, struct file *file, unsigned int 
 		case READ_LS:
 			val= i2c_smbus_read_byte_data(ltr502als->client, DATAREG);
 //			DBG(KERN_INFO, "[LTR502ALS] READ_LS value=%d\n", (int)(val & DLS_DATA_MASK));
-			return (int)(val & DLS_DATA_MASK);
+			return (int)((val & DLS_DATA_MASK) * LS_MULT);
         case SET_PS_THRESHOLD:
         {                	
 			if(copy_from_user(&value, argp, sizeof(value)))	
